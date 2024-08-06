@@ -1,7 +1,7 @@
 exports.handler = async (event) => {
     // TODO implement
     const path = event.rawPath;
-    const method = event.requestContext.http.method;
+    const method = event.requestContext && event.requestContext.http ? event.requestContext.http.method : null;
 
     if (path === '/hello' && method === 'GET') {
         return {
