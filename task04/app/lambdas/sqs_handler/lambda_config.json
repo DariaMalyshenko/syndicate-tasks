@@ -8,9 +8,10 @@
   "memory": 128,
   "timeout": 300,
   "lambda_path": "lambdas\\sqs_handler",
-  "dependsOn":[
+  "dependencies": [
     {
-      "resource_name": "async_queue"
+      "resource_name": "async_queue",
+      "resource_type": "sqs_queue"
     }
   ],
   "event_sources": [

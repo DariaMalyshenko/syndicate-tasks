@@ -24,7 +24,7 @@
     },
     "resource_type": "iam_policy"
   },
-  "asyns_queue": {
+  "async_queue": {
     "resource_type": "sqs_queue",
     "fifo_queue": false,
     "region": "eu-central-1",
