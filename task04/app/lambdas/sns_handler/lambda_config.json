@@ -8,9 +8,18 @@
   "memory": 128,
   "timeout": 100,
   "lambda_path": "lambdas\\sns_handler",
-  "dependencies": [],
-  "event_sources": [],
   "env_variables": {},
+  "dependsOn":[
+    {
+      "resource_name": "lambda_topic"
+    }
+  ],
+  "event_sources": [
+    {
+      "resource_type": "sns_topic_trigger",
+      "target_topic": "lambda_topic"
+    }  
+  ],
   "publish_version": false,
   "url_config": {},
   "ephemeral_storage": 512
