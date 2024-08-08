@@ -16,8 +16,8 @@ exports.handler = async (event, context) => {
         if (eventName === 'INSERT') {
             const itemKey = newImage.key || '';
             const itemValue = newImage.value || '';
-            context.log(itemKey);
-            context.log(itemValue);
+            console.log('Item Key:', itemKey);
+            console.log('Item Value:', itemValue);
 
             const item = {
                 id: uuidv4(),
@@ -53,7 +53,7 @@ exports.handler = async (event, context) => {
             }).promise();
         }
 
-        context.log(JSON.stringify(record));
+        console.log('Processed record:', JSON.stringify(record));
     }
 
     return null;
