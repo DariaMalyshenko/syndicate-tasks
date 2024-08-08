@@ -1,26 +1,21 @@
 const AWS = require('aws-sdk');
 const { v4: uuidv4 } = require('uuid');
-const dynamoDB = new AWS.DynamoDB.DocumentClient();
-const tableName = 'cmtr-712a8896-Audit-test';
+
+const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event, context) => {
-    const table = dynamoDB;
+    const tableName = 'cmtr-712a8896-Audit-test';
 
     for (const record of event.Records) {
         if (!record) continue;
 
         const eventName = record.eventName;
         const newImage = AWS.DynamoDB.Converter.unmarshall(record.dynamodb.NewImage);
+        const oldImage = record.dynamodb.OldImage ? AWS.DynamoDB.Converter.unmarshall(record.dynamodb.OldImage) : null;
 
         if (eventName === 'INSERT') {
             const itemKey = newImage.key || '';
             const itemValue = newImage.value || '';
-            
-            const itemMap = {
-                key: itemKey,
-                value: itemValue
-            };
-
             context.log(itemKey);
             context.log(itemValue);
 
@@ -28,30 +23,31 @@ exports.handler = async (event, context) => {
                 id: uuidv4(),
                 itemKey: itemKey,
                 modificationTime: new Date().toISOString(),
-                newValue: itemMap
+                newValue: {
+                    key: itemKey,
+                    value: itemValue
+                }
             };
 
-            await table.put({
+            await dynamodb.put({
                 TableName: tableName,
                 Item: item
             }).promise();
-
         } else if (eventName === 'MODIFY') {
-            const oldImage = AWS.DynamoDB.Converter.unmarshall(record.dynamodb.OldImage);
-            const newKey = newImage.key || '';
+            const itemKey = newImage.key || '';
             const newValue = newImage.value || '';
-            const oldValue = oldImage.value || '';
+            const oldValue = oldImage ? oldImage.value || '' : '';
 
             const item = {
                 id: uuidv4(),
-                itemKey: newKey,
+                itemKey: itemKey,
                 modificationTime: new Date().toISOString(),
                 updatedAttribute: 'value',
                 oldValue: oldValue,
                 newValue: newValue
             };
 
-            await table.put({
+            await dynamodb.put({
                 TableName: tableName,
                 Item: item
             }).promise();
