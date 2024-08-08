@@ -1,65 +1,63 @@
 const AWS = require('aws-sdk');
 const { v4: uuidv4 } = require('uuid');
-const { formatISO } = require('date-fns');
-
-// Create DynamoDB DocumentClient
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
-const auditTableName = 'cmtr-a8f1e17f-Audit-test';
+const tableName = 'cmtr-a8f1e17f-Audit-test';
 
 exports.handler = async (event, context) => {
-    console.log('Received event:', JSON.stringify(event, null, 2));
+    const table = dynamoDB;
 
     for (const record of event.Records) {
-        if (!record) {
-            continue;
-        }
+        if (!record) continue;
 
-        if (record.eventName === 'INSERT') {
-            const image = record.dynamodb.NewImage;
-            const key = image.key ? image.key.S : '';
-            const value = image.value ? image.value.S : '';
+        const eventName = record.eventName;
+        const newImage = AWS.DynamoDB.Converter.unmarshall(record.dynamodb.NewImage);
 
-            console.log('Key:', key);
-            console.log('Value:', value);
-
-            const item = {
-                TableName: auditTableName,
-                Item: {
-                    id: uuidv4(),
-                    itemKey: key,
-                    modificationTime: formatISO(new Date()),
-                    newValue: {
-                        key,
-                        value
-                    }
-                }
+        if (eventName === 'INSERT') {
+            const itemKey = newImage.key || '';
+            const itemValue = newImage.value || '';
+            
+            const itemMap = {
+                key: itemKey,
+                value: itemValue
             };
 
-            await dynamoDB.put(item).promise();
-        } else if (record.eventName === 'MODIFY') {
-            const newImage = record.dynamodb.NewImage;
-            const newKey = newImage.key ? newImage.key.S : '';
-            const newValue = newImage.value ? newImage.value.S : '';
-
-            const oldImage = record.dynamodb.OldImage;
-            const oldValue = oldImage.value ? oldImage.value.S : '';
+            context.log(itemKey);
+            context.log(itemValue);
 
             const item = {
-                TableName: auditTableName,
-                Item: {
-                    id: uuidv4(),
-                    itemKey: newKey,
-                    modificationTime: formatISO(new Date()),
-                    updatedAttribute: 'value',
-                    oldValue,
-                    newValue
-                }
+                id: uuidv4(),
+                itemKey: itemKey,
+                modificationTime: new Date().toISOString(),
+                newValue: itemMap
             };
 
-            await dynamoDB.put(item).promise();
+            await table.put({
+                TableName: tableName,
+                Item: item
+            }).promise();
+
+        } else if (eventName === 'MODIFY') {
+            const oldImage = AWS.DynamoDB.Converter.unmarshall(record.dynamodb.OldImage);
+            const newKey = newImage.key || '';
+            const newValue = newImage.value || '';
+            const oldValue = oldImage.value || '';
+
+            const item = {
+                id: uuidv4(),
+                itemKey: newKey,
+                modificationTime: new Date().toISOString(),
+                updatedAttribute: 'value',
+                oldValue: oldValue,
+                newValue: newValue
+            };
+
+            await table.put({
+                TableName: tableName,
+                Item: item
+            }).promise();
         }
 
-        console.log('Processed record:', JSON.stringify(record, null, 2));
+        context.log(JSON.stringify(record));
     }
 
     return null;
