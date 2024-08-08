@@ -50,9 +50,9 @@ exports.handler = async (event) => {
         console.log("event data:", eventData);
     
         try {
-            await dynamoDb.put(params).promise();
+            const result = await dynamoDb.put(params).promise();
 
-            console.log(dynamoDb);
+            console.log("result:", result);
     
             return {
                 statusCode: 201,
