@@ -4,6 +4,8 @@ const { v4: uuidv4 } = require('uuid');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
+    console.log("Event:", event);
+    console.log("Body:", event.body);
     const { principalId, content } = JSON.parse(event.body);
     
     const createdAt = new Date().toISOString();
@@ -17,7 +19,7 @@ exports.handler = async (event) => {
     };
 
     const params = {
-        TableName: 'Events',
+        TableName: 'cmtr-712a8896-Events',
         Item: eventData
     };
 
@@ -32,6 +34,7 @@ exports.handler = async (event) => {
             }),
         };
     } catch (error) {
+        console.log(error);
         return {
             statusCode: 500,
             body: JSON.stringify({ 
