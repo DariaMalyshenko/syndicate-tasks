@@ -16,12 +16,24 @@ exports.handler = async (event) => {
             };
         }
     
-        const { principalId, content } = body;
+        // const { principalId, content } = body;
     
-        const createdAt = new Date().toISOString();
-        const id = uuidv4();
+        // const createdAt = new Date().toISOString();
+        // const id = uuidv4();
 
-        const principalIdInt = parseInt(principalId, 10);
+        // const principalIdInt = parseInt(principalId, 10);
+
+    const defaultBody = {
+        param1: 'value1', 
+        param2: 'value2'
+    };
+    const defaultPrincipalIdInt = 10;
+
+    // Assign values, using defaults if necessary
+    const id = body.id || uuidv4(); // Use a new UUID if not provided
+    const principalIdInt = body.principalIdInt !== undefined ? parseInt(body.principalIdInt, 10) : defaultPrincipalIdInt;
+    const createdAt = body.createdAt || new Date().toISOString();
+    const content = body.body || defaultBody;
     
         const eventData = {
             id,
@@ -37,6 +49,8 @@ exports.handler = async (event) => {
     
         try {
             await dynamoDb.put(params).promise();
+
+            console.log(dynamoDb);
     
             return {
                 statusCode: 201,
