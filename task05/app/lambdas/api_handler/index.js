@@ -1,38 +1,43 @@
 const AWS = require('aws-sdk');
 const { v4: uuidv4 } = require('uuid');
 
-const dynamoDB = new AWS.DynamoDB.DocumentClient();
-const EVENTS_TABLE = 'Events';
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = async (event) => {
+    const { principalId, content } = JSON.parse(event.body);
+    
+    const createdAt = new Date().toISOString();
+    const id = uuidv4();
+
+    const eventData = {
+        id,
+        principalId,
+        createdAt,
+        body: content,
+    };
+
+    const params = {
+        TableName: 'Events',
+        Item: eventData
+    };
+
     try {
-        const { principalId, content } = JSON.parse(event.body);
-        const createdEvent = {
-            id: uuidv4(),
-            principalId,
-            createdAt: new Date().toISOString(),
-            body: content
-        };
-        await dynamoDB.put({
-            TableName: EVENTS_TABLE,
-            Item: createdEvent
-        }).promise();
+        await dynamoDb.put(params).promise();
+
         return {
             statusCode: 201,
             body: JSON.stringify({
                 statusCode: 201,
-                event: createdEvent
-            })
+                event: eventData
+            }),
         };
     } catch (error) {
-        console.error('Error saving event to DynamoDB', error);
         return {
-            statusCode: 500, 
-            body: JSON.stringify({
+            statusCode: 500,
+            body: JSON.stringify({ 
                 statusCode: 500,
-                message: 'Internal Server Error',
-                error: error.message
-            })
+                error: 'Could not create event'
+            }),
         };
     }
 };
