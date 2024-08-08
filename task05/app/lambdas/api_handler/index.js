@@ -46,6 +46,8 @@ exports.handler = async (event) => {
             TableName: 'cmtr-712a8896-Events',
             Item: eventData
         };
+
+        console.log("event data:", eventData);
     
         try {
             await dynamoDb.put(params).promise();
