@@ -20,10 +20,12 @@ exports.handler = async (event) => {
     
         const createdAt = new Date().toISOString();
         const id = uuidv4();
+
+        const principalIdInt = parseInt(principalId, 10);
     
         const eventData = {
             id,
-            principalId,
+            principalIdInt,
             createdAt,
             body: content,
         };
