@@ -1,0 +1,6 @@
+name: syndicate-tasks
+build_projects_mapping:
+  nodejs: app
+lambdas:
+  uuid_generator:
+    runtime: nodejs
