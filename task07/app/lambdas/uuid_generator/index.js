@@ -17,17 +17,15 @@ exports.handler = async (event) => {
 
     const S3_OBJECT_KEY = new Date().toISOString();
 
-    const metadata = {
-        ContentLength: Buffer.byteLength(resultJson)
-    };
-
     const inputStream = Buffer.from(resultJson);
 
     const params = {
         Bucket: 'cmtr-712a8896-uuid-storage-test',
         Key: S3_OBJECT_KEY,
         Body: inputStream,
-        Metadata: metadata
+        Metadata: {
+            'ContentLength': Buffer.byteLength(resultJson).toString()
+        }
     };
 
     try {
