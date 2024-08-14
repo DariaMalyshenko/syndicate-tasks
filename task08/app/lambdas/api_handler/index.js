@@ -30,25 +30,28 @@ exports.handler = async (event) => {
 
     const openMeteoAPI = new OpenMeteoAPI();
 
+    const formatJSONWithIndent = (obj) => {
+        return JSON.stringify(obj, null, 2).replace(/:\s+/g, ':  ');
+    };
+
     try {
         const forecast = await openMeteoAPI.getLatestForecast(latitude, longitude);
 
-        // Mocked dates and values for testing purposes
-        const mockedDates = [
-            "2023-12-04T00:00",
-            "2023-12-04T01:00",
-            "2023-12-04T02:00",
-            "..."
-        ];
+        const transformArray = (array) => {
+            if (array.length > 3) {
+                return [...array.slice(0, 3), '...'];
+            }
+            return array;
+        };
 
-        const mockedTemperature = [-2.4, -2.8, -3.2, "..."];
-        const mockedHumidity = [84, 85, 87, "..."];
-        const mockedWindSpeed = [7.6, 6.8, 5.6, "..."];
+        if (!forecast.hourly || !forecast.current_weather) {
+            throw new Error('Missing hourly or current weather data in forecast');
+        }
 
         const formattedResponse = {
-            latitude: latitude,
-            longitude: longitude,
-            generationtime_ms: 0.025033950805664062, 
+            latitude: forecast.latitude,
+            longitude: forecast.longitude,
+            generationtime_ms: forecast.generationtime_ms,
             utc_offset_seconds: 7200,
             timezone: "Europe/Kiev",
             timezone_abbreviation: "EET",
@@ -60,10 +63,10 @@ exports.handler = async (event) => {
                 wind_speed_10m: "km/h"
             },
             hourly: {
-                time: mockedDates,
-                temperature_2m: mockedTemperature,
-                relative_humidity_2m: mockedHumidity,
-                wind_speed_10m: mockedWindSpeed
+                time: transformArray(forecast.hourly.time || []), 
+                temperature_2m: transformArray(forecast.hourly.temperature_2m || []), 
+                relative_humidity_2m: transformArray(forecast.hourly.relative_humidity_2m || []), 
+                wind_speed_10m: transformArray(forecast.hourly.wind_speed_10m || []) 
             },
             current_units: {
                 time: "iso8601",
@@ -72,16 +75,18 @@ exports.handler = async (event) => {
                 wind_speed_10m: "km/h"
             },
             current: {
-                time: "2023-12-04T07:00", 
+                time: forecast.current_weather.time,
                 interval: 900,
-                temperature_2m: 0.2, 
-                wind_speed_10m: 10.0 
+                temperature_2m: forecast.current_weather.temperature, 
+                wind_speed_10m: forecast.current_weather.windspeed
             }
         };
 
+        console.log("Hourly:", hourly);
+
         return {
             statusCode: 200,
-            body: JSON.stringify(formattedResponse),
+            body: formatJSONWithIndent(formattedResponse),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -90,7 +95,7 @@ exports.handler = async (event) => {
         console.error('Error:', error); 
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Error fetching weather data', details: error.message })
+            body: formatJSONWithIndent({ error: 'Error fetching weather data', details: error.message })
         };
     }
 };
