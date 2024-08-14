@@ -40,10 +40,14 @@ exports.handler = async (event) => {
             return array;
         };
 
+        if (!forecast.hourly || !forecast.current_weather) {
+            throw new Error('Missing hourly or current weather data in forecast');
+        }
+
         const formattedResponse = {
             latitude: forecast.latitude,
             longitude: forecast.longitude,
-            generationtime_ms: forecast.generationtime_ms, 
+            generationtime_ms: forecast.generationtime_ms,
             utc_offset_seconds: 7200,
             timezone: "Europe/Kiev",
             timezone_abbreviation: "EET",
@@ -55,10 +59,10 @@ exports.handler = async (event) => {
                 wind_speed_10m: "km/h"
             },
             hourly: {
-                time: transformArray(forecast.hourly.time.slice(0, 4)), 
-                temperature_2m: transformArray(forecast.hourly.temperature_2m.slice(0, 4)), 
-                relative_humidity_2m: (transformArrayforecast.hourly.relative_humidity_2m.slice(0, 4)), 
-                wind_speed_10m: transformArray(forecast.hourly.wind_speed_10m.slice(0, 4)) 
+                time: transformArray(forecast.hourly.time || []), 
+                temperature_2m: transformArray(forecast.hourly.temperature_2m || []), 
+                relative_humidity_2m: transformArray(forecast.hourly.relative_humidity_2m || []), 
+                wind_speed_10m: transformArray(forecast.hourly.wind_speed_10m || []) 
             },
             current_units: {
                 time: "iso8601",
@@ -82,6 +86,7 @@ exports.handler = async (event) => {
             }
         };
     } catch (error) {
+        console.error('Error:', error); 
         return {
             statusCode: 500,
             body: JSON.stringify({ error: 'Error fetching weather data', details: error.message })
