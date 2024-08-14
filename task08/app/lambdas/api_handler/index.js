@@ -33,37 +33,44 @@ exports.handler = async (event) => {
     try {
         const forecast = await openMeteoAPI.getLatestForecast(latitude, longitude);
 
+        const transformArray = (array) => {
+            if (array.length > 3) {
+                return [...array.slice(0, 3), '...'];
+            }
+            return array;
+        };
+
         const formattedResponse = {
             latitude: forecast.latitude,
             longitude: forecast.longitude,
-            generationtime_ms: 0.025033950805664062, 
+            generationtime_ms: forecast.generationtime_ms, 
             utc_offset_seconds: 7200,
             timezone: "Europe/Kiev",
             timezone_abbreviation: "EET",
             elevation: 188.0,
             hourly_units: {
                 time: "iso8601",
-                temperature_2m: "\\u00b0C", 
+                temperature_2m: "\\u00b0C",
                 relative_humidity_2m: "%",
                 wind_speed_10m: "km/h"
             },
             hourly: {
-                time: forecast.hourly.time.slice(0, 4), 
-                temperature_2m: forecast.hourly.temperature_2m.slice(0, 4), 
-                relative_humidity_2m: forecast.hourly.relative_humidity_2m.slice(0, 4), 
-                wind_speed_10m: forecast.hourly.wind_speed_10m.slice(0, 4) 
+                time: transformArray(forecast.hourly.time.slice(0, 4)), 
+                temperature_2m: transformArray(forecast.hourly.temperature_2m.slice(0, 4)), 
+                relative_humidity_2m: (transformArrayforecast.hourly.relative_humidity_2m.slice(0, 4)), 
+                wind_speed_10m: transformArray(forecast.hourly.wind_speed_10m.slice(0, 4)) 
             },
             current_units: {
                 time: "iso8601",
                 interval: "seconds",
-                temperature_2m: "\\u00b0C", 
+                temperature_2m: "\\u00b0C",
                 wind_speed_10m: "km/h"
             },
             current: {
-                time: "2023-12-04T07:00", 
+                time: forecast.current_weather.time,
                 interval: 900,
-                temperature_2m: 0.2, 
-                wind_speed_10m: 10.0 
+                temperature_2m: forecast.current_weather.temperature, 
+                wind_speed_10m: forecast.current_weather.windspeed
             }
         };
 
