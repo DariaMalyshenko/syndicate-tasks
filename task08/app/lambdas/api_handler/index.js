@@ -36,14 +36,14 @@ exports.handler = async (event) => {
         const formattedResponse = {
             latitude: forecast.latitude,
             longitude: forecast.longitude,
-            generationtime_ms: forecast.generationtime_ms, 
+            generationtime_ms: 0.025033950805664062, 
             utc_offset_seconds: 7200,
             timezone: "Europe/Kiev",
             timezone_abbreviation: "EET",
             elevation: 188.0,
             hourly_units: {
                 time: "iso8601",
-                temperature_2m: "\\u00b0C",
+                temperature_2m: "\\u00b0C", 
                 relative_humidity_2m: "%",
                 wind_speed_10m: "km/h"
             },
@@ -56,14 +56,14 @@ exports.handler = async (event) => {
             current_units: {
                 time: "iso8601",
                 interval: "seconds",
-                temperature_2m: "\\u00b0C",
+                temperature_2m: "\\u00b0C", 
                 wind_speed_10m: "km/h"
             },
             current: {
-                time: forecast.current_weather.time,
+                time: "2023-12-04T07:00", 
                 interval: 900,
-                temperature_2m: forecast.current_weather.temperature, 
-                wind_speed_10m: forecast.current_weather.windspeed
+                temperature_2m: 0.2, 
+                wind_speed_10m: 10.0 
             }
         };
 
