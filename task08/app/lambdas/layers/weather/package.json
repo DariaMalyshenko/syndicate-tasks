@@ -1,0 +1,12 @@
+{
+  "name": "weather",
+  "version": "1.0.0",
+  "description": "",
+  "main": "weather.js",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.4"
+  }
+}
