@@ -24,29 +24,34 @@ class OpenMeteoAPI {
     }
 }
 
+const formatJSONWithIndent = (obj) => {
+    return JSON.stringify(obj, null, 2).replace(/:\s*/g, ': ');
+};
+
 exports.handler = async (event) => {
     const latitude = 50.4375;
     const longitude = 30.5;
 
     const openMeteoAPI = new OpenMeteoAPI();
 
-    const formatJSONWithIndent = (obj) => {
-        return JSON.stringify(obj, null, 2).replace(/:\s+/g, ':  ');
-    };
-
     try {
         const forecast = await openMeteoAPI.getLatestForecast(latitude, longitude);
 
+        // Log the raw API response for debugging
+        console.log('Raw API response:', forecast);
+
+        // Ensure hourly data is present
+        if (!forecast.hourly) {
+            throw new Error('Hourly data is missing from the forecast');
+        }
+
+        // Transform array function
         const transformArray = (array) => {
             if (array.length > 3) {
                 return [...array.slice(0, 3), '...'];
             }
             return array;
         };
-
-        if (!forecast.hourly || !forecast.current_weather) {
-            throw new Error('Missing hourly or current weather data in forecast');
-        }
 
         const formattedResponse = {
             latitude: forecast.latitude,
@@ -82,8 +87,6 @@ exports.handler = async (event) => {
             }
         };
 
-        console.log("Hourly:", hourly);
-
         return {
             statusCode: 200,
             body: formatJSONWithIndent(formattedResponse),
@@ -92,10 +95,13 @@ exports.handler = async (event) => {
             }
         };
     } catch (error) {
-        console.error('Error:', error); 
+        console.error('Error:', error);
         return {
             statusCode: 500,
-            body: formatJSONWithIndent({ error: 'Error fetching weather data', details: error.message })
+            body: formatJSONWithIndent({
+                error: 'Error fetching weather data',
+                details: error.message
+            })
         };
     }
 };
