@@ -24,10 +24,6 @@ class OpenMeteoAPI {
     }
 }
 
-const formatJSONWithIndent = (obj) => {
-    return JSON.stringify(obj, null, 2).replace(/:\s*/g, ': ');
-};
-
 exports.handler = async (event) => {
     const latitude = 50.4375;
     const longitude = 30.5;
@@ -36,22 +32,6 @@ exports.handler = async (event) => {
 
     try {
         const forecast = await openMeteoAPI.getLatestForecast(latitude, longitude);
-
-        // Log the raw API response for debugging
-        console.log('Raw API response:', forecast);
-
-        // Ensure hourly data is present
-        if (!forecast.hourly) {
-            throw new Error('Hourly data is missing from the forecast');
-        }
-
-        // Transform array function
-        const transformArray = (array) => {
-            if (array.length > 3) {
-                return [...array.slice(0, 3), '...'];
-            }
-            return array;
-        };
 
         const formattedResponse = {
             latitude: forecast.latitude,
@@ -68,10 +48,10 @@ exports.handler = async (event) => {
                 wind_speed_10m: "km/h"
             },
             hourly: {
-                time: transformArray(forecast.hourly.time || []), 
-                temperature_2m: transformArray(forecast.hourly.temperature_2m || []), 
-                relative_humidity_2m: transformArray(forecast.hourly.relative_humidity_2m || []), 
-                wind_speed_10m: transformArray(forecast.hourly.wind_speed_10m || []) 
+                time: forecast.hourly.time, 
+                temperature_2m: forecast.hourly.temperature_2m, 
+                relative_humidity_2m: forecast.hourly.relative_humidity_2m, 
+                wind_speed_10m: forecast.hourly.wind_speed_10m
             },
             current_units: {
                 time: "iso8601",
@@ -89,19 +69,16 @@ exports.handler = async (event) => {
 
         return {
             statusCode: 200,
-            body: formatJSONWithIndent(formattedResponse),
+            body: JSON.stringify(formattedResponse),
             headers: {
                 'Content-Type': 'application/json'
             }
         };
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error:', error); 
         return {
             statusCode: 500,
-            body: formatJSONWithIndent({
-                error: 'Error fetching weather data',
-                details: error.message
-            })
+            body: JSON.stringify({ error: 'Error fetching weather data', details: error.message })
         };
     }
 };
