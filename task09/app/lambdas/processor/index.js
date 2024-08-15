@@ -58,7 +58,7 @@ exports.handler = async (event) => {
         const id = uuidv4();
 
         const params = {
-            TableName: "cmtr-712a8896-Weather-tests", 
+            TableName: "cmtr-712a8896-Weather-test", 
             Item: {
                 id: id,
                 forecast: formattedForecast
