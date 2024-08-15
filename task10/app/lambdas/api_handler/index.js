@@ -116,7 +116,7 @@ const handleSignin = async (event) => {
 
 const handleGetTables = async () => {
   const params = {
-    TableName: 'cmtr-712a8896-Tables'
+    TableName: 'cmtr-712a8896-Tables-test'
   };
 
   try {
@@ -139,7 +139,7 @@ const handleCreateTable = async (event) => {
   const id = uuidv4();
 
   const params = {
-    TableName: 'cmtr-712a8896-Tables',
+    TableName: 'cmtr-712a8896-Tables-test',
     Item: {
       id,
       number,
@@ -170,7 +170,7 @@ const handleGetTableById = async (event) => {
   console.log(event.pathParameters.id);
 
   const params = {
-    TableName: 'cmtr-712a8896-Tables',
+    TableName: 'cmtr-712a8896-Tables-test',
     Key: {
       id: tableId
     }
@@ -201,7 +201,7 @@ const handleCreateReservation = async (event) => {
 
 
   const params = {
-    TableName: 'cmtr-712a8896-Reservations',
+    TableName: 'cmtr-712a8896-Reservations-test',
     Item: {
       reservationId: id,
       tableNumber,
@@ -229,7 +229,7 @@ const handleCreateReservation = async (event) => {
 
 const handleGetReservations = async () => {
   const params = {
-    TableName: 'cmtr-712a8896-Reservations'
+    TableName: 'cmtr-712a8896-Reservations-test'
   };
 
   try {
