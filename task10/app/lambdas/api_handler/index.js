@@ -204,6 +204,83 @@ const handleGetTableById = async (event) => {
   }
 };
 
+// const handleCreateReservation = async (event) => {
+//   const { tableNumber, clientName, phoneNumber, date, slotTimeStart, slotTimeEnd } = JSON.parse(event.body);
+
+//   const reservationId = uuidv4();
+
+//   const params = {
+//     TableName: RESERVATION_TABLE,
+//     Item: {
+//       id: reservationId,
+//       tableNumber,
+//       clientName,
+//       phoneNumber,
+//       date,
+//       slotTimeStart,
+//       slotTimeEnd
+//     }
+//   };
+
+//   const tableExistsParams = {
+//     TableName: TABLE_TABLE,
+//     FilterExpression: "#tableNumber = :tableNumber",
+//     ExpressionAttributeNames: {
+//       '#tableNumber': 'tableNumber',
+//     },
+//     ExpressionAttributeValues: {
+//       ":tableNumber": tableNumber,
+//     },
+//   };
+
+//   try {
+//     const tableExistsResult = await dynamoDb.scan(tableExistsParams).promise();
+//     if (tableExistsResult.Items.length === 0) {
+//       return {
+//       statusCode: 400,
+//         body: JSON.stringify({ error: 'Table does not exist' })
+//       }
+//     }
+
+//     const paramsCheck = {
+//       TableName: RESERVATION_TABLE,
+//       FilterExpression: '#tableNumber = :tableNumber AND #date = :date AND ((#slotTimeStart < :slotTimeEnd AND #slotTimeEnd > :slotTimeStart) OR (#slotTimeStart < :slotTimeEnd AND #slotTimeEnd > :slotTimeStart))',
+//       ExpressionAttributeNames: {
+//         '#tableNumber': 'tableNumber',
+//         '#date': 'date',
+//         '#slotTimeStart': 'slotTimeStart',
+//         '#slotTimeEnd': 'slotTimeEnd'
+//       },
+//       ExpressionAttributeValues: {
+//         ':tableNumber': tableNumber,
+//         ':date': date,
+//         ':slotTimeStart': slotTimeStart,
+//         ':slotTimeEnd': slotTimeEnd
+//       }
+//     };
+
+//     const existingReservations = await dynamoDb.scan(paramsCheck).promise();
+
+//     if (existingReservations.Items.length > 0) {
+//       return {
+//         statusCode: 400,
+//         body: JSON.stringify({ error: 'Reservation overlaps with an existing reservation' })
+//       };
+//     }
+//     await dynamoDb.put(params).promise();
+//     return {
+//       statusCode: 200,
+//       body: JSON.stringify({ reservationId })
+//     };
+//   } catch (error) {
+//     return {
+//       statusCode: 400,
+//       body: JSON.stringify({ error: error.message })
+//     };
+//   }
+// };
+
+
 const handleCreateReservation = async (event) => {
   const { tableNumber, clientName, phoneNumber, date, slotTimeStart, slotTimeEnd } = JSON.parse(event.body);
 
@@ -235,12 +312,15 @@ const handleCreateReservation = async (event) => {
 
   try {
     const tableExistsResult = await dynamoDb.scan(tableExistsParams).promise();
-    if (tableExistsResult.Items.length === 0) {
-      return {
-      statusCode: 400,
-        body: JSON.stringify({ error: 'Table does not exist' })
-      }}
+    console.log("Table Exists Result:", JSON.stringify(tableExistsResult));
 
+    if (tableExistsResult.Items.length === 0) {
+      console.log("Table does not exist");
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Table does not exist' })
+      };
+    }
 
     const paramsCheck = {
       TableName: RESERVATION_TABLE,
@@ -260,25 +340,31 @@ const handleCreateReservation = async (event) => {
     };
 
     const existingReservations = await dynamoDb.scan(paramsCheck).promise();
+    console.log("Existing Reservations Result:", JSON.stringify(existingReservations));
 
     if (existingReservations.Items.length > 0) {
+      console.log("Reservation overlaps with an existing reservation");
       return {
         statusCode: 400,
         body: JSON.stringify({ error: 'Reservation overlaps with an existing reservation' })
       };
     }
+
     await dynamoDb.put(params).promise();
+    console.log("Reservation created successfully");
     return {
       statusCode: 200,
       body: JSON.stringify({ reservationId })
     };
   } catch (error) {
+    console.error("Error:", error);
     return {
       statusCode: 400,
       body: JSON.stringify({ error: error.message })
     };
   }
 };
+
 
 const handleGetReservations = async () => {
   const params = {
