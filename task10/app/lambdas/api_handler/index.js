@@ -222,7 +222,26 @@ const handleCreateReservation = async (event) => {
     }
   };
 
+  const tableExistsParams = {
+    TableName: TABLE_TABLE,
+    FilterExpression: "#tableNumber = :tableNumber",
+    ExpressionAttributeNames: {
+      '#tableNumber': 'tableNumber',
+    },
+    ExpressionAttributeValues: {
+      ":tableNumber": tableNumber,
+    },
+  };
+
   try {
+    const tableExistsResult = await dynamoDb.scan(tableExistsParams).promise();
+    if (tableExistsResult.Items.length === 0) {
+      return {
+      statusCode: 400,
+        body: JSON.stringify({ error: 'Table does not exist' })
+      }}
+
+
     const paramsCheck = {
       TableName: RESERVATION_TABLE,
       FilterExpression: '#tableNumber = :tableNumber AND #date = :date AND ((#slotTimeStart < :slotTimeEnd AND #slotTimeEnd > :slotTimeStart) OR (#slotTimeStart < :slotTimeEnd AND #slotTimeEnd > :slotTimeStart))',
