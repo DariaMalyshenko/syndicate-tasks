@@ -9,21 +9,11 @@ const CUP_ID = process.env.cup_id;
 const CUP_CLIENT_ID = process.env.cup_client_id;
 
 exports.handler = async (event) => {
-    // const path = event.rawPath;
     console.log("event: ",event);
 
     const {httpMethod, path} = event;
     console.log("httpMethod:", httpMethod);
     console.log("path: ", path);
-    // const method = event.requestContext.http.method;
-    // console.log("httpMethod: ", httpMethod);
-    // console.log("path: ", path);
-    // console.log("event: ",event);
-    // console.log("requestContext:", method);
-    // console.log("path: ", path);
-    // console.log(event.requestContext.http);
-    // console.log(event.requestContext.http.method);
-    // console.log(event.httpMethod);
 
   try {
     switch (true) {
@@ -61,7 +51,6 @@ exports.handler = async (event) => {
 
 const handleSignup = async (event) => {
   const { firstName, lastName, email, password } = JSON.parse(event.body);
-  console.log("data", firstName, lastName, email, password)
 
   const createUserParams = {
     UserPoolId: CUP_ID,
@@ -108,9 +97,7 @@ const handleSignin = async (event) => {
   const { email, password } = JSON.parse(event.body);
 
   const params = {
-    // AuthFlow: 'ADMIN_NO_SRP_AUTH',
     AuthFlow: 'USER_PASSWORD_AUTH',
-    // UserPoolId: CUP_ID,
     ClientId: CUP_CLIENT_ID,
     AuthParameters: {
       USERNAME: email,
@@ -121,7 +108,6 @@ const handleSignin = async (event) => {
   console.log("Params when sign in:", params);
 
   try {
-    // const authResult = await cognito.adminInitiateAuth(params).promise();
     const authResult = await cognito.initiateAuth(params).promise();
 
     return {
@@ -187,9 +173,9 @@ const handleCreateTable = async (event) => {
 
 const handleGetTableById = async (event) => {
   const tableId = parseInt(event.pathParameters.id, 10);
-  // console.log(event);
-  // console.log(event.pathParameters);
-  // console.log(event.pathParameters.id);
+  console.log("event:",event);
+  console.log("event.pathParameters:", event.pathParameters);
+  console.log("event.pathParameters.id:", event.pathParameters.id);
 
   const params = {
     TableName: TABLE_TABLE,
@@ -221,11 +207,12 @@ const handleGetTableById = async (event) => {
 const handleCreateReservation = async (event) => {
   const { tableNumber, clientName, phoneNumber, date, slotTimeStart, slotTimeEnd } = JSON.parse(event.body);
 
+  const reservationId = uuidv4();
 
   const params = {
     TableName: RESERVATION_TABLE,
     Item: {
-      reservationId: id,
+      reservationId,
       tableNumber,
       clientName,
       phoneNumber,
