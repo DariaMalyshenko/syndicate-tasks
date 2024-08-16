@@ -172,10 +172,10 @@ const handleCreateTable = async (event) => {
 };
 
 const handleGetTableById = async (event) => {
-  const tableId = parseInt(event.pathParameters.id, 10);
+  const tableId = parseInt(event.pathParameters.tableId, 10);
   console.log("event:",event);
   console.log("event.pathParameters:", event.pathParameters);
-  console.log("event.pathParameters.id:", event.pathParameters.id);
+  console.log("event.pathParameters.id:", event.pathParameters.tableId);
 
   const params = {
     TableName: TABLE_TABLE,
@@ -207,12 +207,12 @@ const handleGetTableById = async (event) => {
 const handleCreateReservation = async (event) => {
   const { tableNumber, clientName, phoneNumber, date, slotTimeStart, slotTimeEnd } = JSON.parse(event.body);
 
-  const reservationId = uuidv4();
+  const id = uuidv4();
 
   const params = {
     TableName: RESERVATION_TABLE,
     Item: {
-      reservationId,
+      id,
       tableNumber,
       clientName,
       phoneNumber,
