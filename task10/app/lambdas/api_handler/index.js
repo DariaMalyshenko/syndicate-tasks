@@ -156,14 +156,14 @@ const handleGetTables = async () => {
 };
 
 const handleCreateTable = async (event) => {
-  const { number, places, isVip, minOrder } = JSON.parse(event.body);
+  const { id, number, places, isVip, minOrder } = JSON.parse(event.body);
 
-  const id = uuidv4();
+  // const id = uuidv4();
 
   const params = {
     TableName: TABLE_TABLE,
     Item: {
-      id,
+      id: id,
       number,
       places,
       isVip,
