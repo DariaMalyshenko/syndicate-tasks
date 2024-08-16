@@ -207,12 +207,12 @@ const handleGetTableById = async (event) => {
 const handleCreateReservation = async (event) => {
   const { tableNumber, clientName, phoneNumber, date, slotTimeStart, slotTimeEnd } = JSON.parse(event.body);
 
-  const id = uuidv4();
+  const reservationId = uuidv4();
 
   const params = {
     TableName: RESERVATION_TABLE,
     Item: {
-      id,
+      id: reservationId,
       tableNumber,
       clientName,
       phoneNumber,
