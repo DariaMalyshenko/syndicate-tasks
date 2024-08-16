@@ -3,6 +3,11 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const cognito = new AWS.CognitoIdentityServiceProvider();
 const { v4: uuidv4 } = require('uuid');
 
+const TABLE_TABLE = process.env.table_table;
+const RESERVATION_TABLE = process.env.reservation_table;
+const CUP_ID = process.env.cup_id;
+const CUP_CLIENT_ID = process.env.cup_client_id;
+
 exports.handler = async (event) => {
     const path = event.rawPath;
     const method = event.requestContext?.http?.method || event.httpMethod;
@@ -50,7 +55,7 @@ const handleSignup = async (event) => {
   const { firstName, lastName, email, password } = JSON.parse(event.body);
 
   const createUserParams = {
-    UserPoolId: process.env.cup_id,
+    UserPoolId: CUP_ID,
     Username: email,
     UserAttributes: [
       { Name: 'email', Value: email },
@@ -64,7 +69,7 @@ const handleSignup = async (event) => {
     await cognito.adminCreateUser(createUserParams).promise();
 
     const setPasswordParams = {
-      UserPoolId: process.env.cup_id,
+      UserPoolId: CUP_ID,
       Username: email,
       Password: password,
       Permanent: true
@@ -90,8 +95,8 @@ const handleSignin = async (event) => {
 
   const params = {
     AuthFlow: 'ADMIN_NO_SRP_AUTH',
-    UserPoolId: process.env.cup_id,
-    ClientId: process.env.cup_client_id,
+    UserPoolId: CUP_ID,
+    ClientId: CUP_CLIENT_ID,
     AuthParameters: {
       USERNAME: email,
       PASSWORD: password
@@ -117,7 +122,7 @@ const handleSignin = async (event) => {
 
 const handleGetTables = async () => {
   const params = {
-    TableName: 'cmtr-712a8896-Tables-test'
+    TableName: TABLE_TABLE
   };
 
   try {
@@ -140,7 +145,7 @@ const handleCreateTable = async (event) => {
   const id = uuidv4();
 
   const params = {
-    TableName: 'cmtr-712a8896-Tables-test',
+    TableName: TABLE_TABLE,
     Item: {
       id,
       number,
@@ -171,7 +176,7 @@ const handleGetTableById = async (event) => {
   console.log(event.pathParameters.id);
 
   const params = {
-    TableName: 'cmtr-712a8896-Tables-test',
+    TableName: TABLE_TABLE,
     Key: {
       id: tableId
     }
@@ -202,7 +207,7 @@ const handleCreateReservation = async (event) => {
 
 
   const params = {
-    TableName: 'cmtr-712a8896-Reservations-test',
+    TableName: RESERVATION_TABLE,
     Item: {
       reservationId: id,
       tableNumber,
@@ -230,7 +235,7 @@ const handleCreateReservation = async (event) => {
 
 const handleGetReservations = async () => {
   const params = {
-    TableName: 'cmtr-712a8896-Reservations-test'
+    TableName: RESERVATION_TABLE
   };
 
   try {
