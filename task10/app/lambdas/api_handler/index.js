@@ -286,19 +286,6 @@ const handleCreateReservation = async (event) => {
 
   const reservationId = uuidv4();
 
-  const params = {
-    TableName: RESERVATION_TABLE,
-    Item: {
-      id: reservationId,
-      tableNumber,
-      clientName,
-      phoneNumber,
-      date,
-      slotTimeStart,
-      slotTimeEnd
-    }
-  };
-
   const tableExistsParams = {
     TableName: TABLE_TABLE,
     FilterExpression: "#tableNumber = :tableNumber",
@@ -349,6 +336,19 @@ const handleCreateReservation = async (event) => {
         body: JSON.stringify({ error: 'Reservation overlaps with an existing reservation' })
       };
     }
+
+    const params = {
+      TableName: RESERVATION_TABLE,
+      Item: {
+        id: reservationId,
+        tableNumber,
+        clientName,
+        phoneNumber,
+        date,
+        slotTimeStart,
+        slotTimeEnd
+      }
+    };
 
     await dynamoDb.put(params).promise();
     console.log("Reservation created successfully");
