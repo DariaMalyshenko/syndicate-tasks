@@ -15,7 +15,7 @@ exports.handler = async (event) => {
     const {httpMethod, path} = event;
     console.log("httpMethod:", httpMethod);
     console.log("path: ", path);
-    const method = event.requestContext.http.method;
+    // const method = event.requestContext.http.method;
     // console.log("httpMethod: ", httpMethod);
     // console.log("path: ", path);
     // console.log("event: ",event);
@@ -27,25 +27,25 @@ exports.handler = async (event) => {
 
   try {
     switch (true) {
-      case path === '/signup' && method === 'POST':
+      case path === '/signup' && httpMethod === 'POST':
         return handleSignup(event);
 
-      case path === '/signin' && method === 'POST':
+      case path === '/signin' && httpMethod === 'POST':
         return handleSignin(event);
 
-      case path === '/tables' && method === 'GET':
+      case path === '/tables' && httpMethod === 'GET':
         return handleGetTables(event);
 
-      case path === '/tables' && method === 'POST':
+      case path === '/tables' && httpMethod === 'POST':
         return handleCreateTable(event);
 
-      case /^\/tables\/\d+$/.test(path) && method === 'GET':
+      case /^\/tables\/\d+$/.test(path) && httpMethod === 'GET':
         return handleGetTableById(event);
 
-      case path === '/reservations' && method === 'POST':
+      case path === '/reservations' && httpMethod === 'POST':
         return handleCreateReservation(event);
 
-      case path === '/reservations' && method === 'GET':
+      case path === '/reservations' && httpMethod === 'GET':
         return handleGetReservations(event);
 
       default:
