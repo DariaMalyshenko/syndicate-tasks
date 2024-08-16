@@ -207,23 +207,22 @@ const handleGetTableById = async (event) => {
 const handleCreateReservation = async (event) => {
   const { tableNumber, clientName, phoneNumber, date, slotTimeStart, slotTimeEnd } = JSON.parse(event.body);
 
-  const tableParams = {
-    TableName: TABLE_TABLE,
-    Key: {
-      id: tableNumber
+  const reservationId = uuidv4();
+
+  const params = {
+    TableName: RESERVATION_TABLE,
+    Item: {
+      id: reservationId,
+      tableNumber,
+      clientName,
+      phoneNumber,
+      date,
+      slotTimeStart,
+      slotTimeEnd
     }
   };
 
   try {
-    const tableData = await dynamoDb.get(tableParams).promise();
-
-    if (!tableData.Item) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Table does not exist' })
-      };
-    }
-
     const paramsCheck = {
       TableName: RESERVATION_TABLE,
       FilterExpression: '#tableNumber = :tableNumber AND #date = :date AND ((#slotTimeStart < :slotTimeEnd AND #slotTimeEnd > :slotTimeStart) OR (#slotTimeStart < :slotTimeEnd AND #slotTimeEnd > :slotTimeStart))',
@@ -249,31 +248,14 @@ const handleCreateReservation = async (event) => {
         body: JSON.stringify({ error: 'Reservation overlaps with an existing reservation' })
       };
     }
-
-    const reservationId = uuidv4();
-
-    const params = {
-      TableName: RESERVATION_TABLE,
-      Item: {
-        id: reservationId,
-        tableNumber,
-        clientName,
-        phoneNumber,
-        date,
-        slotTimeStart,
-        slotTimeEnd
-      }
-    };
-
     await dynamoDb.put(params).promise();
-
     return {
       statusCode: 200,
-      body: JSON.stringify({ id })
+      body: JSON.stringify({ reservationId })
     };
   } catch (error) {
     return {
-      statusCode: 400, 
+      statusCode: 400,
       body: JSON.stringify({ error: error.message })
     };
   }
