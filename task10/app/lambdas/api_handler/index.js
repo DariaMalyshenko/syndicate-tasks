@@ -284,8 +284,6 @@ const handleGetTableById = async (event) => {
 const handleCreateReservation = async (event) => {
   const { tableNumber, clientName, phoneNumber, date, slotTimeStart, slotTimeEnd } = JSON.parse(event.body);
 
-  const reservationId = uuidv4();
-
   const tableExistsParams = {
     TableName: TABLE_TABLE,
     FilterExpression: "#tableNumber = :tableNumber",
@@ -336,6 +334,8 @@ const handleCreateReservation = async (event) => {
         body: JSON.stringify({ error: 'Reservation overlaps with an existing reservation' })
       };
     }
+
+    const reservationId = uuidv4();
 
     const params = {
       TableName: RESERVATION_TABLE,
