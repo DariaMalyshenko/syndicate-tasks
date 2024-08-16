@@ -223,6 +223,31 @@ const handleCreateReservation = async (event) => {
   };
 
   try {
+    const paramsCheck = {
+      TableName: RESERVATION_TABLE,
+      FilterExpression: '#tableNumber = :tableNumber AND #date = :date AND ((#slotTimeStart < :slotTimeEnd AND #slotTimeEnd > :slotTimeStart) OR (#slotTimeStart < :slotTimeEnd AND #slotTimeEnd > :slotTimeStart))',
+      ExpressionAttributeNames: {
+        '#tableNumber': 'tableNumber',
+        '#date': 'date',
+        '#slotTimeStart': 'slotTimeStart',
+        '#slotTimeEnd': 'slotTimeEnd'
+      },
+      ExpressionAttributeValues: {
+        ':tableNumber': tableNumber,
+        ':date': date,
+        ':slotTimeStart': slotTimeStart,
+        ':slotTimeEnd': slotTimeEnd
+      }
+    };
+
+    const existingReservations = await dynamoDb.scan(paramsCheck).promise();
+
+    if (existingReservations.Items.length > 0) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Reservation overlaps with an existing reservation' })
+      };
+    }
     await dynamoDb.put(params).promise();
     return {
       statusCode: 200,
