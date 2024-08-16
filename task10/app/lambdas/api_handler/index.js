@@ -9,13 +9,18 @@ const CUP_ID = process.env.cup_id;
 const CUP_CLIENT_ID = process.env.cup_client_id;
 
 exports.handler = async (event) => {
-    const path = event.rawPath;
+    // const path = event.rawPath;
+    console.log("event: ",event);
+
+    const {httpMethod, path} = event;
+    console.log("httpMethod:", httpMethod);
+    console.log("path: ", path);
     const method = event.requestContext.http.method;
     // console.log("httpMethod: ", httpMethod);
     // console.log("path: ", path);
-    console.log("event: ",event);
-    console.log("requestContext:", method);
-    console.log("path: ", path);
+    // console.log("event: ",event);
+    // console.log("requestContext:", method);
+    // console.log("path: ", path);
     // console.log(event.requestContext.http);
     // console.log(event.requestContext.http.method);
     // console.log(event.httpMethod);
