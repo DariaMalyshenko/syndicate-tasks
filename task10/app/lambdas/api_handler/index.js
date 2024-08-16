@@ -284,28 +284,28 @@ const handleGetTableById = async (event) => {
 const handleCreateReservation = async (event) => {
   const { tableNumber, clientName, phoneNumber, date, slotTimeStart, slotTimeEnd } = JSON.parse(event.body);
 
-  const tableExistsParams = {
-    TableName: TABLE_TABLE,
-    FilterExpression: "#tableNumber = :tableNumber",
-    ExpressionAttributeNames: {
-      '#tableNumber': 'tableNumber',
-    },
-    ExpressionAttributeValues: {
-      ":tableNumber": tableNumber,
-    },
-  };
+  // const tableExistsParams = {
+  //   TableName: TABLE_TABLE,
+  //   FilterExpression: "#tableNumber = :tableNumber",
+  //   ExpressionAttributeNames: {
+  //     '#tableNumber': 'tableNumber',
+  //   },
+  //   ExpressionAttributeValues: {
+  //     ":tableNumber": tableNumber,
+  //   },
+  // };
 
   try {
-    const tableExistsResult = await dynamoDb.scan(tableExistsParams).promise();
-    console.log("Table Exists Result:", JSON.stringify(tableExistsResult));
+    // const tableExistsResult = await dynamoDb.scan(tableExistsParams).promise();
+    // console.log("Table Exists Result:", JSON.stringify(tableExistsResult));
 
-    if (tableExistsResult.Items.length === 0) {
-      console.log("Table does not exist");
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Table does not exist' })
-      };
-    }
+    // if (tableExistsResult.Items.length === 0) {
+    //   console.log("Table does not exist");
+    //   return {
+    //     statusCode: 400,
+    //     body: JSON.stringify({ error: 'Table does not exist' })
+    //   };
+    // }
 
     const paramsCheck = {
       TableName: RESERVATION_TABLE,
