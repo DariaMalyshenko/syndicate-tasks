@@ -9,35 +9,36 @@ const CUP_ID = process.env.cup_id;
 const CUP_CLIENT_ID = process.env.cup_client_id;
 
 exports.handler = async (event) => {
-    const path = event.rawPath;
-    const method = event.requestContext?.http?.method || event.httpMethod;
+  const {httpMethod, path} = event;
+    // const path = event.rawPath;
+    // const method = event.requestContext?.http?.method || event.httpMethod;
+    console.log(httpMethod, path);
     console.log(event);
-    console.log(event.requestContext);
-    console.log(event.requestContext.http);
-    console.log(event.requestContext.http.method);
-    console.log(event.httpMethod);
+    // console.log(event.requestContext.http);
+    // console.log(event.requestContext.http.method);
+    // console.log(event.httpMethod);
 
   try {
     switch (true) {
-      case path === '/signup' && method === 'POST':
+      case path === '/signup' && httpMethod === 'POST':
         return handleSignup(event);
 
-      case path === '/signin' && method === 'POST':
+      case path === '/signin' && httpMethod === 'POST':
         return handleSignin(event);
 
-      case path === '/tables' && method === 'GET':
+      case path === '/tables' && httpMethod === 'GET':
         return handleGetTables(event);
 
-      case path === '/tables' && method === 'POST':
+      case path === '/tables' && httpMethod === 'POST':
         return handleCreateTable(event);
 
-      case /^\/tables\/\d+$/.test(path) && method === 'GET':
+      case /^\/tables\/\d+$/.test(path) && httpMethod === 'GET':
         return handleGetTableById(event);
 
-      case path === '/reservations' && method === 'POST':
+      case path === '/reservations' && httpMethod === 'POST':
         return handleCreateReservation(event);
 
-      case path === '/reservations' && method === 'GET':
+      case path === '/reservations' && httpMethod === 'GET':
         return handleGetReservations(event);
 
       default:
