@@ -94,7 +94,8 @@ const handleSignin = async (event) => {
   const { email, password } = JSON.parse(event.body);
 
   const params = {
-    AuthFlow: 'ADMIN_NO_SRP_AUTH',
+    // AuthFlow: 'ADMIN_NO_SRP_AUTH',
+    AuthFlow: 'USER_PASSWORD_AUTH',
     UserPoolId: CUP_ID,
     ClientId: CUP_CLIENT_ID,
     AuthParameters: {
@@ -106,7 +107,8 @@ const handleSignin = async (event) => {
   console.log("Params when sign in:", params);
 
   try {
-    const authResult = await cognito.adminInitiateAuth(params).promise();
+    // const authResult = await cognito.adminInitiateAuth(params).promise();
+    const authResult = await cognito.initiateAuth(params).promise();
 
     return {
       statusCode: 200,
