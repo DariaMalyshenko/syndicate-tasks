@@ -9,36 +9,38 @@ const CUP_ID = process.env.cup_id;
 const CUP_CLIENT_ID = process.env.cup_client_id;
 
 exports.handler = async (event) => {
-  const {httpMethod, path} = event;
-    // const path = event.rawPath;
-    // const method = event.requestContext?.http?.method || event.httpMethod;
-    console.log(httpMethod, path);
-    console.log(event);
+    const path = event.rawPath;
+    const method = event.requestContext.http.method;
+    // console.log("httpMethod: ", httpMethod);
+    // console.log("path: ", path);
+    console.log("event: ",event);
+    console.log("requestContext:", method);
+    console.log("path: ", path);
     // console.log(event.requestContext.http);
     // console.log(event.requestContext.http.method);
     // console.log(event.httpMethod);
 
   try {
     switch (true) {
-      case path === '/signup' && httpMethod === 'POST':
+      case path === '/signup' && method === 'POST':
         return handleSignup(event);
 
-      case path === '/signin' && httpMethod === 'POST':
+      case path === '/signin' && method === 'POST':
         return handleSignin(event);
 
-      case path === '/tables' && httpMethod === 'GET':
+      case path === '/tables' && method === 'GET':
         return handleGetTables(event);
 
-      case path === '/tables' && httpMethod === 'POST':
+      case path === '/tables' && method === 'POST':
         return handleCreateTable(event);
 
-      case /^\/tables\/\d+$/.test(path) && httpMethod === 'GET':
+      case /^\/tables\/\d+$/.test(path) && method === 'GET':
         return handleGetTableById(event);
 
-      case path === '/reservations' && httpMethod === 'POST':
+      case path === '/reservations' && method === 'POST':
         return handleCreateReservation(event);
 
-      case path === '/reservations' && httpMethod === 'GET':
+      case path === '/reservations' && method === 'GET':
         return handleGetReservations(event);
 
       default:
@@ -54,6 +56,7 @@ exports.handler = async (event) => {
 
 const handleSignup = async (event) => {
   const { firstName, lastName, email, password } = JSON.parse(event.body);
+  console.log("data", firstName, lastName, email, password)
 
   const createUserParams = {
     UserPoolId: CUP_ID,
@@ -66,6 +69,9 @@ const handleSignup = async (event) => {
     TemporaryPassword: password
   };
 
+  console.log("event: ", event);
+
+
   try {
     await cognito.adminCreateUser(createUserParams).promise();
 
@@ -77,6 +83,8 @@ const handleSignup = async (event) => {
     };
 
     await cognito.adminSetUserPassword(setPasswordParams).promise();
+
+    console.log("cognito:", cognito);
 
     return {
       statusCode: 200,
@@ -97,7 +105,7 @@ const handleSignin = async (event) => {
   const params = {
     // AuthFlow: 'ADMIN_NO_SRP_AUTH',
     AuthFlow: 'USER_PASSWORD_AUTH',
-    UserPoolId: CUP_ID,
+    // UserPoolId: CUP_ID,
     ClientId: CUP_CLIENT_ID,
     AuthParameters: {
       USERNAME: email,
@@ -174,9 +182,9 @@ const handleCreateTable = async (event) => {
 
 const handleGetTableById = async (event) => {
   const tableId = parseInt(event.pathParameters.id, 10);
-  console.log(event);
-  console.log(event.pathParameters);
-  console.log(event.pathParameters.id);
+  // console.log(event);
+  // console.log(event.pathParameters);
+  // console.log(event.pathParameters.id);
 
   const params = {
     TableName: TABLE_TABLE,
