@@ -5,11 +5,12 @@ const { v4: uuidv4 } = require('uuid');
 
 exports.handler = async (event) => {
     const path = event.rawPath;
-    const method = event.requestContext.http.method;
-
-    console.log(path);
-    console.log(method);
-    console.log(/^\/tables\/\d+$/.test(path));
+    const method = event.requestContext?.http?.method || event.httpMethod;
+    console.log(event);
+    console.log(event.requestContext);
+    console.log(event.requestContext.http);
+    console.log(event.requestContext.http.method);
+    console.log(event.httpMethod);
 
   try {
     switch (true) {
